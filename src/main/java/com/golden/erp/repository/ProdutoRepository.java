@@ -4,6 +4,7 @@ import com.golden.erp.entity.Produto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,12 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
                                @Param("sku") String sku,
                                @Param("ativo") Boolean ativo,
                                Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Produto p SET p.estoque = p.estoque - :quantidade WHERE p.id = :produtoId")
+    void baixarEstoque(@Param("produtoId") Long produtoId, @Param("quantidade") Integer quantidade);
+
+    @Modifying
+    @Query("UPDATE Produto p SET p.estoque = p.estoque + :quantidade WHERE p.id = :produtoId")
+    void devolverEstoque(@Param("produtoId") Long produtoId, @Param("quantidade") Integer quantidade);
 }

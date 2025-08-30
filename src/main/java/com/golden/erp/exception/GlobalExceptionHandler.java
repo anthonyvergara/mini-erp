@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
             status = HttpStatus.CONFLICT;
         } else if (message.contains("CEP inválido") || message.contains("inválido")) {
             status = HttpStatus.BAD_REQUEST;
-        } else if (message.contains("estoque insuficiente") || message.contains("regra")) {
+        } else if (message.contains("Estoque insuficiente") || message.contains("regra")) {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
         }
 
