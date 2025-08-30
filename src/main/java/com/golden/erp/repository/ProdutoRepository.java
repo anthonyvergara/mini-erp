@@ -17,14 +17,14 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     boolean existsBySku(String sku);
 
-    @Query("SELECT p FROM Produto p WHERE " +
-           "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
-           "(:sku IS NULL OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :sku, '%'))) AND " +
-           "(:ativo IS NULL OR p.ativo = :ativo)")
+    @Query(value = "SELECT p FROM Produto p WHERE " +
+            "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:nome AS text), '%'))) AND " +
+            "(:sku IS NULL OR LOWER(p.sku) LIKE LOWER(CONCAT('%', CAST(:sku AS text), '%'))) AND " +
+            "(:ativo IS NULL OR p.ativo = :ativo)")
     Page<Produto> findByFilters(@Param("nome") String nome,
-                               @Param("sku") String sku,
-                               @Param("ativo") Boolean ativo,
-                               Pageable pageable);
+                                @Param("sku") String sku,
+                                @Param("ativo") Boolean ativo,
+                                Pageable pageable);
 
     @Modifying
     @Query("UPDATE Produto p SET p.estoque = p.estoque - :quantidade WHERE p.id = :produtoId")
