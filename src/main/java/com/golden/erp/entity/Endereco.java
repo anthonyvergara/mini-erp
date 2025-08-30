@@ -1,4 +1,4 @@
-package com.golden.erp.domain.entity;
+package com.golden.erp.entity;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;

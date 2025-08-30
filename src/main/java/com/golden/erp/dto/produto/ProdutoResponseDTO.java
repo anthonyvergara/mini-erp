@@ -82,3 +82,4 @@ public class ProdutoResponseDTO {
         this.ativo = ativo;
     }
 }
+

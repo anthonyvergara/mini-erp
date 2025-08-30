@@ -1,7 +1,7 @@
 package com.golden.erp.service;
 
-import com.golden.erp.domain.entity.Cliente;
-import com.golden.erp.domain.entity.Endereco;
+import com.golden.erp.entity.Cliente;
+import com.golden.erp.entity.Endereco;
 import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
 import com.golden.erp.dto.cliente.EnderecoRequestDTO;
@@ -85,10 +85,11 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     public void excluir(Long id) {
-        logger.info("Excluindo cliente ID: {}", id);
+        logger.info("Executando soft delete do cliente ID: {}", id);
         Cliente cliente = buscarClientePorId(id);
-        clienteRepository.delete(cliente);
-        logger.info("Cliente excluído com sucesso. ID: {}", id);
+        cliente.markAsDeleted();
+        clienteRepository.save(cliente);
+        logger.info("Cliente marcado como excluído com sucesso. ID: {}", id);
     }
 
     private Cliente buscarClientePorId(Long id) {
@@ -156,7 +157,9 @@ public class ClienteServiceImpl implements ClienteService {
                 cliente.getNome(),
                 cliente.getEmail(),
                 cliente.getCpf(),
-                enderecoResponse
+                enderecoResponse,
+                cliente.getCreatedAt(),
+                cliente.getUpdatedAt()
         );
     }
 }

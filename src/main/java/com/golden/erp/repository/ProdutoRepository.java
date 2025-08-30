@@ -1,6 +1,6 @@
 package com.golden.erp.repository;
 
-import com.golden.erp.domain.entity.Produto;
+import com.golden.erp.entity.Produto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -21,3 +21,4 @@ INSERT INTO clientes (nome, email, cpf, logradouro, numero, complemento, bairro,
 ('João Silva', 'joao.silva@email.com', '12345678901', 'Rua das Flores', '123', 'Apto 101', 'Centro', 'São Paulo', 'SP', '01310100'),
 ('Maria Santos', 'maria.santos@email.com', '98765432109', 'Avenida Paulista', '1000', 'Sala 50', 'Bela Vista', 'São Paulo', 'SP', '01310200'),
 ('Pedro Oliveira', 'pedro.oliveira@email.com', '45678912345', 'Rua Augusta', '500', '', 'Consolação', 'São Paulo', 'SP', '01305000');
+

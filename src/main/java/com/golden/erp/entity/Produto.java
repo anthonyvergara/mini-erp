@@ -1,19 +1,19 @@
-package com.golden.erp.domain.entity;
+package com.golden.erp.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
+import org.hibernate.annotations.SQLRestriction;
 @Entity
-@Table(name = "produtos")
-public class Produto {
+@SQLRestriction("deleted_at IS NULL")
+public class Produto extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "SKU é obrigatório")
-    @Size(max = 50, message = "SKU deve ter no máximo 50 caracteres")
     @Column(nullable = false, unique = true, length = 50)
     private String sku;
 

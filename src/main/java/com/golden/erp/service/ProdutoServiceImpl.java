@@ -1,6 +1,6 @@
 package com.golden.erp.service;
 
-import com.golden.erp.domain.entity.Produto;
+import com.golden.erp.entity.Produto;
 import com.golden.erp.dto.produto.ProdutoRequestDTO;
 import com.golden.erp.dto.produto.ProdutoResponseDTO;
 import com.golden.erp.interfaces.ProdutoService;
@@ -80,10 +80,11 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     public void excluir(Long id) {
-        logger.info("Excluindo produto ID: {}", id);
+        logger.info("Executando soft delete do produto ID: {}", id);
         Produto produto = buscarProdutoPorId(id);
-        produtoRepository.delete(produto);
-        logger.info("Produto excluído com sucesso. ID: {} - SKU: {}", produto.getId(), produto.getSku());
+        produto.markAsDeleted();
+        produtoRepository.save(produto);
+        logger.info("Produto marcado como excluído com sucesso. ID: {} - SKU: {}", produto.getId(), produto.getSku());
     }
 
     private Produto buscarProdutoPorId(Long id) {
