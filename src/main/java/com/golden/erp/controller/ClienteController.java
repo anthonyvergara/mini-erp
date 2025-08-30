@@ -43,7 +43,7 @@ public class ClienteController {
     @GetMapping
     public ResponseEntity<Page<ClienteResponseDTO>> listar(
             @RequestParam(required = false) String nome,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable) {
         Page<ClienteResponseDTO> response = clienteService.listar(nome, pageable);
         return ResponseEntity.ok(response);
     }

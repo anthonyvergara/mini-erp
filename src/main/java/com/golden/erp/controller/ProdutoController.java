@@ -45,7 +45,7 @@ public class ProdutoController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String sku,
             @RequestParam(required = false) Boolean ativo,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable) {
         Page<ProdutoResponseDTO> response = produtoService.listar(nome, sku, ativo, pageable);
         return ResponseEntity.ok(response);
     }
