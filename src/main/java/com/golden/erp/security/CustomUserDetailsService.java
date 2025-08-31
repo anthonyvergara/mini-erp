@@ -1,7 +1,6 @@
-package com.golden.erp.service;
+package com.golden.erp.security;
 
 import com.golden.erp.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

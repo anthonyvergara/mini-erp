@@ -3,7 +3,7 @@ package com.golden.erp.controller;
 import com.golden.erp.dto.auth.AuthenticationRequest;
 import com.golden.erp.dto.auth.AuthenticationResponse;
 import com.golden.erp.dto.auth.RegisterRequest;
-import com.golden.erp.service.AuthenticationService;
+import com.golden.erp.security.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

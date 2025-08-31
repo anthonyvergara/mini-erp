@@ -1,4 +1,4 @@
-package com.golden.erp.service;
+package com.golden.erp.security;
 
 import com.golden.erp.dto.auth.AuthenticationRequest;
 import com.golden.erp.dto.auth.AuthenticationResponse;

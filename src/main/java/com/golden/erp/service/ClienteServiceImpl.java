@@ -6,6 +6,7 @@ import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
 import com.golden.erp.dto.cliente.EnderecoRequestDTO;
 import com.golden.erp.dto.cliente.EnderecoResponseDTO;
+import com.golden.erp.integration.cep.ViaCepService;
 import com.golden.erp.interfaces.ClienteService;
 import com.golden.erp.repository.ClienteRepository;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.golden.erp.service;
+package com.golden.erp.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

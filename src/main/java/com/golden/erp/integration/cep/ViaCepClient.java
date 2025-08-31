@@ -1,4 +1,4 @@
-package com.golden.erp.integration;
+package com.golden.erp.integration.cep;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

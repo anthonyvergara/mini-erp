@@ -1,6 +1,6 @@
 package com.golden.erp.config;
 
-import com.golden.erp.service.JwtService;
+import com.golden.erp.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

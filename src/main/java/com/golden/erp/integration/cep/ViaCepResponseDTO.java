@@ -1,4 +1,4 @@
-package com.golden.erp.integration;
+package com.golden.erp.integration.cep;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
