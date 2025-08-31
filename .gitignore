@@ -33,5 +33,5 @@ build/
 .vscode/
 
 *.md
-*.sql
+000-drop-existing-tables.sql
 *.log

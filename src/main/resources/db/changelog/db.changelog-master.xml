@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Include SQL changelog files -->
+    <include file="db/changelog/000-drop-existing-tables.sql"/>
+    <include file="db/changelog/001-create-usuarios-table.sql"/>
+    <include file="db/changelog/002-create-clientes-table.sql"/>
+    <include file="db/changelog/003-create-produto-table.sql"/>
+    <include file="db/changelog/004-create-pedidos-table.sql"/>
+    <include file="db/changelog/005-create-item-pedido-table.sql"/>
+    <include file="db/changelog/006-create-indexes.sql"/>
+    <include file="db/changelog/007-insert-initial-data.sql"/>
+
+</databaseChangeLog>
