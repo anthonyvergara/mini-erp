@@ -23,20 +23,15 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
     private final ExchangeRateService exchangeRateService;
-    private final MeterRegistry meterRegistry;
 
-    public PedidoController(PedidoService pedidoService, ExchangeRateService exchangeRateService, MeterRegistry meterRegistry) {
+    public PedidoController(PedidoService pedidoService, ExchangeRateService exchangeRateService) {
         this.pedidoService = pedidoService;
         this.exchangeRateService = exchangeRateService;
-        this.meterRegistry = meterRegistry;
     }
 
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> criar(@Valid @RequestBody PedidoRequestDTO request) {
         PedidoResponseDTO response = pedidoService.criar(request);
-        meterRegistry.counter("pedidos.criados").increment();
-        String horaAtual = String.valueOf(LocalDateTime.now().getHour());
-        meterRegistry.counter("pedidos.criados.por_hora", "hora", horaAtual).increment();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

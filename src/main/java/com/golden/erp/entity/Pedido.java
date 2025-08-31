@@ -1,5 +1,6 @@
 package com.golden.erp.entity;
 
+import com.golden.erp.metrics.PedidoMetricsListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@EntityListeners(PedidoMetricsListener.class)
 @Table(name = "pedidos")
 @SQLRestriction("deleted_at IS NULL")
 public class Pedido extends BaseEntity {

@@ -50,14 +50,14 @@
 
     <!-- Configuração específica para reduzir logs verbosos do Hibernate -->
     <logger name="org.hibernate" level="WARN"/>
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <!--<logger name="org.hibernate.SQL" level="DEBUG"/>-->
     <logger name="org.hibernate.orm.connections.pooling" level="ERROR"/>
 
     <!-- Configuração para logs da aplicação -->
     <logger name="com.golden.erp" level="INFO"/>
 
     <!-- Configuração para logs do Spring Web -->
-    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
 
     <!-- Root logger -->
     <root level="INFO">
