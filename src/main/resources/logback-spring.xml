@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Console Appender com JSON estruturado -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                          "timestamp": "%d{ISO8601}",
+                          "level": "%level",
+                          "logger": "%logger{40}",
+                          "thread": "%thread",
+                          "message": "%msg",
+                          "context": "%mdc"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- File Appender com JSON estruturado (opcional) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/mini-erp.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/mini-erp.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                          "timestamp": "%d{ISO8601}",
+                          "level": "%level",
+                          "logger": "%logger{40}",
+                          "thread": "%thread",
+                          "message": "%msg",
+                          "context": "%mdc"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Configuração específica para reduzir logs verbosos do Hibernate -->
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.orm.connections.pooling" level="ERROR"/>
+
+    <!-- Configuração para logs da aplicação -->
+    <logger name="com.golden.erp" level="INFO"/>
+
+    <!-- Configuração para logs do Spring Web -->
+    <logger name="org.springframework.web" level="DEBUG"/>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

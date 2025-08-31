@@ -1,5 +1,6 @@
 package com.golden.erp.integration.cep;
 
+import com.golden.erp.dto.cep.ViaCepResponseDTO;
 import com.golden.erp.dto.cliente.EnderecoRequestDTO;
 import feign.FeignException;
 import org.slf4j.Logger;
