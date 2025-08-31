@@ -6,6 +6,7 @@ import com.golden.erp.dto.pedido.PedidoUsdTotalResponseDTO;
 import com.golden.erp.entity.StatusPedido;
 import com.golden.erp.interfaces.PedidoService;
 import com.golden.erp.integration.exchange.ExchangeRateService;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,21 +15,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
 
     private final PedidoService pedidoService;
     private final ExchangeRateService exchangeRateService;
+    private final MeterRegistry meterRegistry;
 
-    public PedidoController(PedidoService pedidoService, ExchangeRateService exchangeRateService) {
+    public PedidoController(PedidoService pedidoService, ExchangeRateService exchangeRateService, MeterRegistry meterRegistry) {
         this.pedidoService = pedidoService;
         this.exchangeRateService = exchangeRateService;
+        this.meterRegistry = meterRegistry;
     }
 
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> criar(@Valid @RequestBody PedidoRequestDTO request) {
         PedidoResponseDTO response = pedidoService.criar(request);
+        meterRegistry.counter("pedidos.criados").increment();
+        String horaAtual = String.valueOf(LocalDateTime.now().getHour());
+        meterRegistry.counter("pedidos.criados.por_hora", "hora", horaAtual).increment();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
