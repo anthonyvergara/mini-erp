@@ -5,6 +5,7 @@ import com.golden.erp.dto.produto.ProdutoRequestDTO;
 import com.golden.erp.dto.produto.ProdutoResponseDTO;
 import com.golden.erp.interfaces.ProdutoService;
 import com.golden.erp.infrastructure.repository.ProdutoRepository;
+import com.golden.erp.mapper.ProdutoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -19,9 +20,11 @@ public class ProdutoServiceImpl implements ProdutoService {
     private static final Logger logger = LoggerFactory.getLogger(ProdutoServiceImpl.class);
 
     private final ProdutoRepository produtoRepository;
+    private final ProdutoMapper produtoMapper;
 
-    public ProdutoServiceImpl(ProdutoRepository produtoRepository) {
+    public ProdutoServiceImpl(ProdutoRepository produtoRepository, ProdutoMapper produtoMapper) {
         this.produtoRepository = produtoRepository;
+        this.produtoMapper = produtoMapper;
     }
 
     public ProdutoResponseDTO criar(ProdutoRequestDTO request) {
@@ -30,18 +33,12 @@ public class ProdutoServiceImpl implements ProdutoService {
         validarUnicidadeSku(request.getSku(), null);
         validarRegrasNegocio(request);
 
-        Produto produto = new Produto();
-        produto.setSku(request.getSku());
-        produto.setNome(request.getNome());
-        produto.setPrecoBruto(request.getPrecoBruto());
-        produto.setEstoque(request.getEstoque());
-        produto.setEstoqueMinimo(request.getEstoqueMinimo());
-        produto.setAtivo(request.getAtivo());
+        Produto produto = produtoMapper.toEntity(request);
 
         Produto produtoSalvo = produtoRepository.save(produto);
         logger.info("Produto criado com sucesso. ID: {} - SKU: {}", produtoSalvo.getId(), produtoSalvo.getSku());
 
-        return converterParaResponseDTO(produtoSalvo);
+        return produtoMapper.toResponseDTO(produtoSalvo);
     }
 
     public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO request) {
@@ -52,31 +49,26 @@ public class ProdutoServiceImpl implements ProdutoService {
         validarUnicidadeSku(request.getSku(), id);
         validarRegrasNegocio(request);
 
-        produto.setSku(request.getSku());
-        produto.setNome(request.getNome());
-        produto.setPrecoBruto(request.getPrecoBruto());
-        produto.setEstoque(request.getEstoque());
-        produto.setEstoqueMinimo(request.getEstoqueMinimo());
-        produto.setAtivo(request.getAtivo());
+        produtoMapper.updateEntityFromDTO(request, produto);
 
         Produto produtoAtualizado = produtoRepository.save(produto);
         logger.info("Produto atualizado com sucesso. ID: {} - SKU: {}", produtoAtualizado.getId(), produtoAtualizado.getSku());
 
-        return converterParaResponseDTO(produtoAtualizado);
+        return produtoMapper.toResponseDTO(produtoAtualizado);
     }
 
     @Transactional(readOnly = true)
     public ProdutoResponseDTO buscarPorId(Long id) {
         logger.info("Buscando produto por ID: {}", id);
         Produto produto = buscarProdutoPorId(id);
-        return converterParaResponseDTO(produto);
+        return produtoMapper.toResponseDTO(produto);
     }
 
     @Transactional(readOnly = true)
     public Page<ProdutoResponseDTO> listar(String nome, String sku, Boolean ativo, Pageable pageable) {
         logger.info("Listando produtos com filtros - nome: {}, sku: {}, ativo: {}", nome, sku, ativo);
         Page<Produto> produtos = produtoRepository.findByFilters(nome, sku, ativo, pageable);
-        return produtos.map(this::converterParaResponseDTO);
+        return produtos.map(produtoMapper::toResponseDTO);
     }
 
     public void excluir(Long id) {
@@ -126,17 +118,5 @@ public class ProdutoServiceImpl implements ProdutoService {
         if (!request.getAtivo()) {
             logger.warn("Produto {} será criado/atualizado como inativo", request.getNome());
         }
-    }
-
-    private ProdutoResponseDTO converterParaResponseDTO(Produto produto) {
-        return new ProdutoResponseDTO(
-                produto.getId(),
-                produto.getSku(),
-                produto.getNome(),
-                produto.getPrecoBruto(),
-                produto.getEstoque(),
-                produto.getEstoqueMinimo(),
-                produto.getAtivo()
-        );
     }
 }

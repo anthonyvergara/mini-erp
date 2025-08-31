@@ -6,6 +6,7 @@ import com.golden.erp.infrastructure.repository.ClienteRepository;
 import com.golden.erp.infrastructure.repository.PedidoRepository;
 import com.golden.erp.infrastructure.repository.ProdutoRepository;
 import com.golden.erp.interfaces.PedidoService;
+import com.golden.erp.mapper.PedidoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,13 +30,16 @@ public class PedidoServiceImpl implements PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;
     private final ProdutoRepository produtoRepository;
+    private final PedidoMapper pedidoMapper;
 
     public PedidoServiceImpl(PedidoRepository pedidoRepository,
                            ClienteRepository clienteRepository,
-                           ProdutoRepository produtoRepository) {
+                           ProdutoRepository produtoRepository,
+                           PedidoMapper pedidoMapper) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
         this.produtoRepository = produtoRepository;
+        this.pedidoMapper = pedidoMapper;
     }
 
     @Override
@@ -66,7 +70,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido = pedidoRepository.save(pedido);
 
         logger.info("Pedido criado com sucesso. ID: {}", pedido.getId());
-        return mapToResponseDTO(pedido);
+        return pedidoMapper.toResponseDTO(pedido);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Pedido não encontrado");
         }
 
-        return mapToResponseDTO(pedido);
+        return pedidoMapper.toResponseDTO(pedido);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class PedidoServiceImpl implements PedidoService {
         logger.info("Listando pedidos com filtros - clienteId: {}, status: {}", clienteId, status);
 
         Page<Pedido> pedidos = pedidoRepository.findByFilters(clienteId, status, pageable);
-        return pedidos.map(this::mapToResponseDTO);
+        return pedidos.map(pedidoMapper::toResponseDTO);
     }
 
     @Override
@@ -101,7 +105,7 @@ public class PedidoServiceImpl implements PedidoService {
             pedido = pedidoRepository.save(pedido);
 
             logger.info("Pedido pago com sucesso. ID: {}", id);
-            return mapToResponseDTO(pedido);
+            return pedidoMapper.toResponseDTO(pedido);
         } catch (IllegalStateException e) {
             throw new RuntimeException("Não é possível pagar o pedido: " + e.getMessage());
         }
@@ -129,7 +133,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido = pedidoRepository.save(pedido);
 
         logger.info("Pedido cancelado com sucesso. ID: {}", id);
-        return mapToResponseDTO(pedido);
+        return pedidoMapper.toResponseDTO(pedido);
     }
 
     @Override
@@ -256,39 +260,5 @@ public class PedidoServiceImpl implements PedidoService {
         for (Map.Entry<Long, Integer> entry : quantidadePorProduto.entrySet()) {
             produtoRepository.devolverEstoque(entry.getKey(), entry.getValue());
         }
-    }
-
-    private PedidoResponseDTO mapToResponseDTO(Pedido pedido) {
-        PedidoResponseDTO dto = new PedidoResponseDTO();
-        dto.setId(pedido.getId());
-        dto.setClienteId(pedido.getCliente().getId());
-        dto.setClienteNome(pedido.getCliente().getNome());
-        dto.setStatus(pedido.getStatus());
-        dto.setSubtotal(pedido.getSubtotal());
-        dto.setTotalDesconto(pedido.getTotalDesconto());
-        dto.setTotal(pedido.getTotal());
-        dto.setCreatedAt(pedido.getCreatedAt());
-        dto.setUpdatedAt(pedido.getUpdatedAt());
-
-        if (pedido.getItens() != null) {
-            List<ItemPedidoResponseDTO> itensDTO = pedido.getItens().stream()
-                    .map(this::mapItemToResponseDTO)
-                    .toList();
-            dto.setItens(itensDTO);
-        }
-
-        return dto;
-    }
-
-    private ItemPedidoResponseDTO mapItemToResponseDTO(ItemPedido item) {
-        ItemPedidoResponseDTO dto = new ItemPedidoResponseDTO();
-        dto.setId(item.getId());
-        dto.setProdutoId(item.getProduto().getId());
-        dto.setProdutoNome(item.getProduto().getNome());
-        dto.setQuantidade(item.getQuantidade());
-        dto.setPrecoUnitario(item.getPrecoUnitario());
-        dto.setDesconto(item.getDesconto());
-        dto.setSubtotal(item.getSubtotal());
-        return dto;
     }
 }
