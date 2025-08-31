@@ -1,14 +1,12 @@
 package com.golden.erp.service;
 
 import com.golden.erp.domain.Cliente;
-import com.golden.erp.domain.Endereco;
 import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
-import com.golden.erp.dto.cliente.EnderecoRequestDTO;
-import com.golden.erp.dto.cliente.EnderecoResponseDTO;
 import com.golden.erp.infrastructure.integration.cep.ViaCepService;
 import com.golden.erp.interfaces.ClienteService;
 import com.golden.erp.infrastructure.repository.ClienteRepository;
+import com.golden.erp.mapper.ClienteMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,10 +22,12 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final ViaCepService viaCepService;
+    private final ClienteMapper clienteMapper;
 
-    public ClienteServiceImpl(ClienteRepository clienteRepository, ViaCepService viaCepService) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, ViaCepService viaCepService, ClienteMapper clienteMapper) {
         this.clienteRepository = clienteRepository;
         this.viaCepService = viaCepService;
+        this.clienteMapper = clienteMapper;
     }
 
     public ClienteResponseDTO criar(ClienteRequestDTO request) {
@@ -36,18 +36,14 @@ public class ClienteServiceImpl implements ClienteService {
         validarUnicidadeEmail(request.getEmail(), null);
         validarUnicidadeCpf(request.getCpf(), null);
 
-        EnderecoRequestDTO enderecoRequest = viaCepService.preencherEnderecoComViaCep(request.getEndereco());
+        request.setEndereco(viaCepService.preencherEnderecoComViaCep(request.getEndereco()));
 
-        Cliente cliente = new Cliente();
-        cliente.setNome(request.getNome());
-        cliente.setEmail(request.getEmail());
-        cliente.setCpf(request.getCpf());
-        cliente.setEndereco(converterParaEndereco(enderecoRequest));
+        Cliente cliente = clienteMapper.toEntity(request);
 
         Cliente clienteSalvo = clienteRepository.save(cliente);
         logger.info("Cliente criado com sucesso. ID: {}", clienteSalvo.getId());
 
-        return converterParaResponseDTO(clienteSalvo);
+        return clienteMapper.toResponseDTO(clienteSalvo);
     }
 
     public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO request) {
@@ -58,31 +54,28 @@ public class ClienteServiceImpl implements ClienteService {
         validarUnicidadeEmail(request.getEmail(), id);
         validarUnicidadeCpf(request.getCpf(), id);
 
-        EnderecoRequestDTO enderecoRequest = viaCepService.preencherEnderecoComViaCep(request.getEndereco());
+        request.setEndereco(viaCepService.preencherEnderecoComViaCep(request.getEndereco()));
 
-        cliente.setNome(request.getNome());
-        cliente.setEmail(request.getEmail());
-        cliente.setCpf(request.getCpf());
-        cliente.setEndereco(converterParaEndereco(enderecoRequest));
+        clienteMapper.updateEntityFromDTO(request, cliente);
 
         Cliente clienteAtualizado = clienteRepository.save(cliente);
         logger.info("Cliente atualizado com sucesso. ID: {}", clienteAtualizado.getId());
 
-        return converterParaResponseDTO(clienteAtualizado);
+        return clienteMapper.toResponseDTO(clienteAtualizado);
     }
 
     @Transactional(readOnly = true)
     public ClienteResponseDTO buscarPorId(Long id) {
         logger.info("Buscando cliente por ID: {}", id);
         Cliente cliente = buscarClientePorId(id);
-        return converterParaResponseDTO(cliente);
+        return clienteMapper.toResponseDTO(cliente);
     }
 
     @Transactional(readOnly = true)
     public Page<ClienteResponseDTO> listar(String nome, Pageable pageable) {
         logger.info("Listando clientes com filtro nome: {}", nome);
         Page<Cliente> clientes = clienteRepository.findByFilters(nome, pageable);
-        return clientes.map(this::converterParaResponseDTO);
+        return clientes.map(clienteMapper::toResponseDTO);
     }
 
     public void excluir(Long id) {
@@ -128,39 +121,5 @@ public class ClienteServiceImpl implements ClienteService {
                 throw new RuntimeException("CPF já está em uso");
             }
         }
-    }
-
-    private Endereco converterParaEndereco(EnderecoRequestDTO request) {
-        return new Endereco(
-                request.getLogradouro(),
-                request.getNumero(),
-                request.getComplemento(),
-                request.getBairro(),
-                request.getCidade(),
-                request.getUf(),
-                request.getCep()
-        );
-    }
-
-    private ClienteResponseDTO converterParaResponseDTO(Cliente cliente) {
-        EnderecoResponseDTO enderecoResponse = new EnderecoResponseDTO(
-                cliente.getEndereco().getLogradouro(),
-                cliente.getEndereco().getNumero(),
-                cliente.getEndereco().getComplemento(),
-                cliente.getEndereco().getBairro(),
-                cliente.getEndereco().getCidade(),
-                cliente.getEndereco().getUf(),
-                cliente.getEndereco().getCep()
-        );
-
-        return new ClienteResponseDTO(
-                cliente.getId(),
-                cliente.getNome(),
-                cliente.getEmail(),
-                cliente.getCpf(),
-                enderecoResponse,
-                cliente.getCreatedAt(),
-                cliente.getUpdatedAt()
-        );
     }
 }
