@@ -7,8 +7,6 @@ import java.util.Map;
 
 public class ExchangeRateResponseDTO {
 
-    private boolean success;
-
     @JsonProperty("base")
     private String baseCurrency;
 
@@ -21,11 +19,8 @@ public class ExchangeRateResponseDTO {
     public ExchangeRateResponseDTO() {}
 
     public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
+        // A nova API não retorna campo success, então verificamos se temos dados válidos
+        return rates != null && !rates.isEmpty();
     }
 
     public String getBaseCurrency() {

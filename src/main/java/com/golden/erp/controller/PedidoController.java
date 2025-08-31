@@ -65,7 +65,7 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/orders/{id}/usd-total")
+    @GetMapping("/{id}/usd-total")
     public ResponseEntity<PedidoUsdTotalResponseDTO> obterTotalEmUsd(@PathVariable Long id) {
         PedidoResponseDTO pedido = pedidoService.buscarPorId(id);
 

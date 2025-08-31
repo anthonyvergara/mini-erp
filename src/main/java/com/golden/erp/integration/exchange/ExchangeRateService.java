@@ -37,7 +37,7 @@ public class ExchangeRateService {
         // Buscar nova cotação
         try {
             logger.info("Buscando nova cotação BRL->USD da API externa");
-            ExchangeRateResponseDTO response = exchangeRateClient.getLatestRates("BRL", "USD");
+            ExchangeRateResponseDTO response = exchangeRateClient.getLatestRates("BRL");
 
             if (response.isSuccess() && response.getUsdRate() != null) {
                 BigDecimal usdRate = response.getUsdRate();
