@@ -157,9 +157,14 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     private Map<Long, Produto> validarProdutosEEstoque(List<ItemPedidoRequestDTO> itens) {
-        List<Long> produtoIds = itens.stream()
-                .map(ItemPedidoRequestDTO::getProdutoId)
-                .toList();
+        // Agrupar produtos duplicados e somar quantidades
+        Map<Long, Integer> quantidadePorProduto = itens.stream()
+                .collect(Collectors.groupingBy(
+                    ItemPedidoRequestDTO::getProdutoId,
+                    Collectors.summingInt(ItemPedidoRequestDTO::getQuantidade)
+                ));
+
+        List<Long> produtoIds = new ArrayList<>(quantidadePorProduto.keySet());
 
         Map<Long, Produto> produtos = produtoRepository.findAllById(produtoIds)
                 .stream()
@@ -184,13 +189,16 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Produtos inativos: " + produtosInativos);
         }
 
-        // Verificar estoque
+        // Verificar estoque considerando agrupamento
         List<String> produtosSemEstoque = new ArrayList<>();
-        for (ItemPedidoRequestDTO item : itens) {
-            Produto produto = produtos.get(item.getProdutoId());
-            if (produto.getEstoque() < item.getQuantidade()) {
+        for (Map.Entry<Long, Integer> entry : quantidadePorProduto.entrySet()) {
+            Long produtoId = entry.getKey();
+            Integer quantidadeTotal = entry.getValue();
+            Produto produto = produtos.get(produtoId);
+
+            if (produto.getEstoque() < quantidadeTotal) {
                 produtosSemEstoque.add(String.format("%s (disponível: %d, solicitado: %d)",
-                    produto.getNome(), produto.getEstoque(), item.getQuantidade()));
+                    produto.getNome(), produto.getEstoque(), quantidadeTotal));
             }
         }
 
