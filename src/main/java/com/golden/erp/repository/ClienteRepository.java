@@ -20,7 +20,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     boolean existsByCpf(String cpf);
 
-    @Query("SELECT c FROM Cliente c WHERE " +
-           "(:nome IS NULL OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :nome, '%')))")
+    @Query(value = "SELECT * FROM clientes c WHERE " +
+           "(c.deleted_at IS NULL) AND " +
+           "(:nome IS NULL OR CAST(c.nome AS VARCHAR) ILIKE CONCAT('%', :nome, '%'))",
+           nativeQuery = true)
     Page<Cliente> findByFilters(@Param("nome") String nome, Pageable pageable);
 }
