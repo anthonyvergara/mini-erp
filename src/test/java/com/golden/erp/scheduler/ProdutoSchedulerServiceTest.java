@@ -50,77 +50,52 @@ class ProdutoSchedulerServiceTest {
     @Test
     void verificarReabastecimento_DeveLogarProdutosComEstoqueBaixo() {
         // Given
-        List<Produto> produtos = Arrays.asList(
+        List<Produto> produtosComEstoqueBaixo = Arrays.asList(
             produtoComEstoqueBaixo,
-            produtoComEstoqueAdequado,
             produtoComEstoqueZero
         );
-        when(produtoRepository.findAll()).thenReturn(produtos);
+        when(produtoRepository.findProdutosComEstoqueBaixo()).thenReturn(produtosComEstoqueBaixo);
 
         // When
         produtoSchedulerService.verificarReabastecimento();
 
         // Then
-        verify(produtoRepository).findAll();
-
-        // Verificações de que os produtos corretos foram identificados
-        // produtoComEstoqueBaixo: estoque 5 < estoqueMinimo 10 - deve ser logado
-        // produtoComEstoqueAdequado: estoque 15 >= estoqueMinimo 10 - não deve ser logado
-        // produtoComEstoqueZero: estoque 0 < estoqueMinimo 5 - deve ser logado
+        verify(produtoRepository).findProdutosComEstoqueBaixo();
     }
 
     @Test
     void verificarReabastecimento_QuandoTodosProdutosTemEstoqueAdequado_NaoDeveLogarReabastecimento() {
         // Given
-        List<Produto> produtos = Arrays.asList(produtoComEstoqueAdequado);
-        when(produtoRepository.findAll()).thenReturn(produtos);
+        when(produtoRepository.findProdutosComEstoqueBaixo()).thenReturn(Collections.emptyList());
 
         // When
         produtoSchedulerService.verificarReabastecimento();
 
         // Then
-        verify(produtoRepository).findAll();
+        verify(produtoRepository).findProdutosComEstoqueBaixo();
     }
 
     @Test
     void verificarReabastecimento_QuandoNaoHaProdutos_NaoDeveLogarReabastecimento() {
         // Given
-        when(produtoRepository.findAll()).thenReturn(Collections.emptyList());
+        when(produtoRepository.findProdutosComEstoqueBaixo()).thenReturn(Collections.emptyList());
 
         // When
         produtoSchedulerService.verificarReabastecimento();
 
         // Then
-        verify(produtoRepository).findAll();
+        verify(produtoRepository).findProdutosComEstoqueBaixo();
     }
 
     @Test
     void verificarReabastecimento_QuandoOcorreExcecao_DeveLogarErro() {
         // Given
-        when(produtoRepository.findAll())
+        when(produtoRepository.findProdutosComEstoqueBaixo())
             .thenThrow(new RuntimeException("Erro de banco de dados"));
 
         // When/Then - Não deve lançar exceção, apenas logar
         produtoSchedulerService.verificarReabastecimento();
 
-        verify(produtoRepository).findAll();
-    }
-
-    @Test
-    void verificarReabastecimento_ProdutoComEstoqueIgualAoMinimo_NaoDeveLogarReabastecimento() {
-        // Given
-        Produto produtoComEstoqueIgualMinimo = new Produto("SKU004", "Produto D",
-            new BigDecimal("40.00"), 10, 10, true);
-        produtoComEstoqueIgualMinimo.setId(4L);
-
-        List<Produto> produtos = Arrays.asList(produtoComEstoqueIgualMinimo);
-        when(produtoRepository.findAll()).thenReturn(produtos);
-
-        // When
-        produtoSchedulerService.verificarReabastecimento();
-
-        // Then
-        verify(produtoRepository).findAll();
-        // Produto com estoque igual ao mínimo não deve ser considerado para reabastecimento
+        verify(produtoRepository).findProdutosComEstoqueBaixo();
     }
 }

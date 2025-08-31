@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,61 +60,70 @@ class PedidoSchedulerServiceTest {
     @Test
     void marcarPedidosAtrasados_DeveMarcarApenasPedidosComMaisDe48Horas() {
         // Given
-        List<Pedido> pedidosCreated = Arrays.asList(pedidoAtrasado, pedidoRecente);
-        when(pedidoRepository.findByStatus(StatusPedido.CREATED)).thenReturn(pedidosCreated);
+        List<Pedido> pedidosAtrasados = Arrays.asList(pedidoAtrasado);
+        when(pedidoRepository.findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class)))
+            .thenReturn(pedidosAtrasados);
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoAtrasado);
 
         // When
         pedidoSchedulerService.marcarPedidosAtrasados();
 
         // Then
-        verify(pedidoRepository).findByStatus(StatusPedido.CREATED);
+        verify(pedidoRepository).findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class));
         verify(pedidoRepository, times(1)).save(pedidoAtrasado);
-        verify(pedidoRepository, never()).save(pedidoRecente);
 
         // Verificar se o status foi alterado
         assert pedidoAtrasado.getStatus() == StatusPedido.LATE;
-        assert pedidoRecente.getStatus() == StatusPedido.CREATED;
     }
 
     @Test
-    void marcarPedidosAtrasados_QuandoNaoHaPedidosCreated_NaoDeveMarcarNenhum() {
+    void marcarPedidosAtrasados_QuandoNaoHaPedidosAtrasados_NaoDeveMarcarNenhum() {
         // Given
-        when(pedidoRepository.findByStatus(StatusPedido.CREATED)).thenReturn(Collections.emptyList());
+        when(pedidoRepository.findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class)))
+            .thenReturn(Collections.emptyList());
 
         // When
         pedidoSchedulerService.marcarPedidosAtrasados();
 
         // Then
-        verify(pedidoRepository).findByStatus(StatusPedido.CREATED);
+        verify(pedidoRepository).findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class));
         verify(pedidoRepository, never()).save(any(Pedido.class));
-    }
-
-    @Test
-    void marcarPedidosAtrasados_QuandoTodosPedidosSaoRecentes_NaoDeveMarcarNenhum() {
-        // Given
-        List<Pedido> pedidosRecentes = Arrays.asList(pedidoRecente);
-        when(pedidoRepository.findByStatus(StatusPedido.CREATED)).thenReturn(pedidosRecentes);
-
-        // When
-        pedidoSchedulerService.marcarPedidosAtrasados();
-
-        // Then
-        verify(pedidoRepository).findByStatus(StatusPedido.CREATED);
-        verify(pedidoRepository, never()).save(any(Pedido.class));
-        assert pedidoRecente.getStatus() == StatusPedido.CREATED;
     }
 
     @Test
     void marcarPedidosAtrasados_QuandoOcorreExcecao_DeveLogarErro() {
         // Given
-        when(pedidoRepository.findByStatus(StatusPedido.CREATED))
+        when(pedidoRepository.findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class)))
             .thenThrow(new RuntimeException("Erro de banco de dados"));
 
         // When/Then - Não deve lançar exceção, apenas logar
         pedidoSchedulerService.marcarPedidosAtrasados();
 
-        verify(pedidoRepository).findByStatus(StatusPedido.CREATED);
+        verify(pedidoRepository).findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class));
         verify(pedidoRepository, never()).save(any(Pedido.class));
+    }
+
+    @Test
+    void marcarPedidosAtrasados_ComMultiplosPedidos_DeveMarcarTodos() {
+        // Given
+        Pedido outroPedidoAtrasado = new Pedido(cliente);
+        outroPedidoAtrasado.setId(3L);
+        outroPedidoAtrasado.setStatus(StatusPedido.CREATED);
+
+        List<Pedido> pedidosAtrasados = Arrays.asList(pedidoAtrasado, outroPedidoAtrasado);
+        when(pedidoRepository.findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class)))
+            .thenReturn(pedidosAtrasados);
+        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoAtrasado);
+
+        // When
+        pedidoSchedulerService.marcarPedidosAtrasados();
+
+        // Then
+        verify(pedidoRepository).findPedidosAtrasados(eq(StatusPedido.CREATED), any(LocalDateTime.class));
+        verify(pedidoRepository, times(2)).save(any(Pedido.class));
+
+        // Verificar se ambos os status foram alterados
+        assert pedidoAtrasado.getStatus() == StatusPedido.LATE;
+        assert outroPedidoAtrasado.getStatus() == StatusPedido.LATE;
     }
 }

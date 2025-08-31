@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
@@ -33,4 +34,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Modifying
     @Query("UPDATE Produto p SET p.estoque = p.estoque + :quantidade WHERE p.id = :produtoId")
     void devolverEstoque(@Param("produtoId") Long produtoId, @Param("quantidade") Integer quantidade);
+
+    @Query("SELECT p FROM Produto p WHERE p.estoque < p.estoqueMinimo AND p.ativo = true")
+    List<Produto> findProdutosComEstoqueBaixo();
 }

@@ -5,7 +5,6 @@ import com.golden.erp.entity.StatusPedido;
 import com.golden.erp.repository.PedidoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,11 @@ public class PedidoSchedulerService {
 
     private static final Logger logger = LoggerFactory.getLogger(PedidoSchedulerService.class);
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
+
+    public PedidoSchedulerService(PedidoRepository pedidoRepository) {
+        this.pedidoRepository = pedidoRepository;
+    }
 
     /**
      * Tarefa A: Marcar pedidos atrasados
@@ -33,18 +35,18 @@ public class PedidoSchedulerService {
         try {
             LocalDateTime limitTime = LocalDateTime.now().minusHours(48);
 
-            // Buscar pedidos CREATED criados há mais de 48 horas
-            List<Pedido> pedidosCreated = pedidoRepository.findByStatus(StatusPedido.CREATED);
+            List<Pedido> pedidosAtrasados = pedidoRepository.findPedidosAtrasados(StatusPedido.CREATED, limitTime);
 
-            int pedidosAtualizados = 0;
-            for (Pedido pedido : pedidosCreated) {
-                if (pedido.getCreatedAt().isBefore(limitTime)) {
-                    pedido.setStatus(StatusPedido.LATE);
-                    pedidoRepository.save(pedido);
-                    pedidosAtualizados++;
-                    logger.debug("Pedido ID {} marcado como atrasado", pedido.getId());
-                }
-            }
+            long pedidosAtualizados = pedidosAtrasados.stream()
+                    .peek(pedido -> {
+                        pedido.setStatus(StatusPedido.LATE);
+                        logger.debug("Pedido ID {} marcado como atrasado", pedido.getId());
+                    })
+                    .mapToLong(pedido -> {
+                        pedidoRepository.save(pedido);
+                        return 1;
+                    })
+                    .sum();
 
             logger.info("Verificação de pedidos atrasados concluída. {} pedidos marcados como atrasados", pedidosAtualizados);
 

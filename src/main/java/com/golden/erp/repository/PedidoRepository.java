@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -26,4 +27,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT p FROM Pedido p JOIN FETCH p.cliente JOIN FETCH p.itens i JOIN FETCH i.produto WHERE p.id = :id")
     Pedido findByIdWithFullDetails(@Param("id") Long id);
+
+    @Query("SELECT p FROM Pedido p WHERE p.status = :status AND p.createdAt < :limitTime")
+    List<Pedido> findPedidosAtrasados(
+            @Param("status") StatusPedido status,
+            @Param("limitTime") LocalDateTime limitTime);
 }

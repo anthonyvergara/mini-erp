@@ -4,7 +4,6 @@ import com.golden.erp.entity.Produto;
 import com.golden.erp.repository.ProdutoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,11 @@ public class ProdutoSchedulerService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProdutoSchedulerService.class);
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+    private final ProdutoRepository produtoRepository;
+
+    public ProdutoSchedulerService(ProdutoRepository produtoRepository) {
+        this.produtoRepository = produtoRepository;
+    }
 
     /**
      * Tarefa B: Reabastecimento
@@ -27,22 +29,17 @@ public class ProdutoSchedulerService {
         logger.info("Iniciando verificação de reabastecimento de produtos");
 
         try {
-            List<Produto> todosProdutos = produtoRepository.findAll();
+            List<Produto> produtosParaReabastecer = produtoRepository.findProdutosComEstoqueBaixo();
 
-            int produtosParaReabastecer = 0;
+            produtosParaReabastecer.forEach(produto ->
+                logger.warn("REABASTECIMENTO NECESSÁRIO - Produto: {} (SKU: {}) - Estoque atual: {} - Estoque mínimo: {}",
+                           produto.getNome(), produto.getSku(), produto.getEstoque(), produto.getEstoqueMinimo())
+            );
 
-            for (Produto produto : todosProdutos) {
-                if (produto.getEstoque() < produto.getEstoqueMinimo()) {
-                    logger.warn("REABASTECIMENTO NECESSÁRIO - Produto: {} (SKU: {}) - Estoque atual: {} - Estoque mínimo: {}",
-                               produto.getNome(), produto.getSku(), produto.getEstoque(), produto.getEstoqueMinimo());
-                    produtosParaReabastecer++;
-                }
-            }
-
-            if (produtosParaReabastecer == 0) {
+            if (produtosParaReabastecer.isEmpty()) {
                 logger.info("Verificação de reabastecimento concluída. Nenhum produto necessita reabastecimento");
             } else {
-                logger.info("Verificação de reabastecimento concluída. {} produtos necessitam reabastecimento", produtosParaReabastecer);
+                logger.info("Verificação de reabastecimento concluída. {} produtos necessitam reabastecimento", produtosParaReabastecer.size());
             }
 
         } catch (Exception e) {
