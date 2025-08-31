@@ -28,13 +28,11 @@ public class ExchangeRateService {
         String cacheKey = "BRL_USD";
         CachedRate cachedRate = cache.get(cacheKey);
 
-        // Verificar se o cache é válido
         if (cachedRate != null && cachedRate.isValid()) {
             logger.debug("Retornando cotação BRL->USD do cache: {}", cachedRate.getRate());
             return cachedRate.getRate();
         }
 
-        // Buscar nova cotação
         try {
             logger.info("Buscando nova cotação BRL->USD da API externa");
             ExchangeRateResponseDTO response = exchangeRateClient.getLatestRates("BRL");
@@ -42,7 +40,6 @@ public class ExchangeRateService {
             if (response.isSuccess() && response.getUsdRate() != null) {
                 BigDecimal usdRate = response.getUsdRate();
 
-                // Armazenar no cache
                 cache.put(cacheKey, new CachedRate(usdRate, LocalDateTime.now()));
 
                 logger.info("Nova cotação BRL->USD obtida e armazenada no cache: {}", usdRate);
@@ -65,7 +62,6 @@ public class ExchangeRateService {
         return brlAmount.multiply(usdRate).setScale(2, RoundingMode.HALF_UP);
     }
 
-    // Limpar cache (útil para testes ou manutenção)
     public void clearCache() {
         cache.clear();
         logger.info("Cache de cotações limpo");

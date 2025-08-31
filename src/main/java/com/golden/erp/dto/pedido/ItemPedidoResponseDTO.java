@@ -12,10 +12,8 @@ public class ItemPedidoResponseDTO {
     private BigDecimal desconto;
     private BigDecimal subtotal;
 
-    // Construtores
     public ItemPedidoResponseDTO() {}
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

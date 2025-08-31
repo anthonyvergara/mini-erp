@@ -34,12 +34,10 @@ public abstract class BaseEntity {
         updatedAt = LocalDateTime.now();
     }
 
-    // Método para soft delete
     public void markAsDeleted() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    // Getters
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

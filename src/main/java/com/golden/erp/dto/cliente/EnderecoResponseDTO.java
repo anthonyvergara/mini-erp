@@ -23,7 +23,6 @@ public class EnderecoResponseDTO {
         this.cep = cep;
     }
 
-    // Getters and Setters
     public String getLogradouro() {
         return logradouro;
     }

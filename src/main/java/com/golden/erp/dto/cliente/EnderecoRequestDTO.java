@@ -40,7 +40,6 @@ public class EnderecoRequestDTO {
         this.cep = cep;
     }
 
-    // Getters and Setters
     public String getLogradouro() {
         return logradouro;
     }

@@ -41,7 +41,6 @@ public class ProdutoRequestDTO {
         this.ativo = ativo;
     }
 
-    // Getters and Setters
     public String getSku() {
         return sku;
     }

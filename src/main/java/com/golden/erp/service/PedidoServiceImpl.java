@@ -46,27 +46,20 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoResponseDTO criar(PedidoRequestDTO request) {
         logger.info("Criando pedido para cliente ID: {}", request.getClienteId());
 
-        // Validar cliente
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        // Validar produtos e verificar estoque
         Map<Long, Produto> produtos = validarProdutosEEstoque(request.getItens());
 
-        // Criar pedido
         Pedido pedido = new Pedido(cliente);
 
-        // Criar itens do pedido
         List<ItemPedido> itens = criarItensPedido(pedido, request.getItens(), produtos);
         pedido.setItens(itens);
 
-        // Calcular totais
         calcularTotais(pedido);
 
-        // Baixar estoque
         baixarEstoque(request.getItens(), produtos);
 
-        // Salvar pedido
         pedido = pedidoRepository.save(pedido);
 
         logger.info("Pedido criado com sucesso. ID: {}", pedido.getId());
@@ -124,7 +117,6 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Pedido já pago não pode ser cancelado");
         }
 
-        // Devolver estoque se não estiver pago
         if (!pedido.estaPago()) {
             devolverEstoque(pedido.getItens());
         }
@@ -145,7 +137,6 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Pedido não encontrado");
         }
 
-        // Devolver estoque se não estiver pago
         if (!pedido.estaPago()) {
             devolverEstoque(pedido.getItens());
         }
@@ -157,7 +148,6 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     private Map<Long, Produto> validarProdutosEEstoque(List<ItemPedidoRequestDTO> itens) {
-        // Agrupar produtos duplicados e somar quantidades
         Map<Long, Integer> quantidadePorProduto = itens.stream()
                 .collect(Collectors.groupingBy(
                     ItemPedidoRequestDTO::getProdutoId,
@@ -170,7 +160,6 @@ public class PedidoServiceImpl implements PedidoService {
                 .stream()
                 .collect(Collectors.toMap(Produto::getId, p -> p));
 
-        // Verificar se todos os produtos foram encontrados
         List<Long> produtosNaoEncontrados = produtoIds.stream()
                 .filter(id -> !produtos.containsKey(id))
                 .toList();
@@ -179,7 +168,6 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Produtos não encontrados: " + produtosNaoEncontrados);
         }
 
-        // Verificar se produtos estão ativos
         List<String> produtosInativos = produtos.values().stream()
                 .filter(p -> !p.getAtivo())
                 .map(Produto::getNome)
@@ -189,7 +177,6 @@ public class PedidoServiceImpl implements PedidoService {
             throw new RuntimeException("Produtos inativos: " + produtosInativos);
         }
 
-        // Verificar estoque considerando agrupamento
         List<String> produtosSemEstoque = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : quantidadePorProduto.entrySet()) {
             Long produtoId = entry.getKey();
@@ -236,35 +223,30 @@ public class PedidoServiceImpl implements PedidoService {
 
         BigDecimal total = subtotal.subtract(totalDesconto);
 
-        // Arredondamento seguro com 2 casas decimais
         pedido.setSubtotal(subtotal.setScale(2, RoundingMode.HALF_UP));
         pedido.setTotalDesconto(totalDesconto.setScale(2, RoundingMode.HALF_UP));
         pedido.setTotal(total.setScale(2, RoundingMode.HALF_UP));
     }
 
     private void baixarEstoque(List<ItemPedidoRequestDTO> itens, Map<Long, Produto> produtos) {
-        // Agrupar por produto para somar quantidades em caso de produtos duplicados no pedido
         Map<Long, Integer> quantidadePorProduto = itens.stream()
                 .collect(Collectors.groupingBy(
                     ItemPedidoRequestDTO::getProdutoId,
                     Collectors.summingInt(ItemPedidoRequestDTO::getQuantidade)
                 ));
 
-        // Atualizar estoque diretamente no banco usando batch update
         for (Map.Entry<Long, Integer> entry : quantidadePorProduto.entrySet()) {
             produtoRepository.baixarEstoque(entry.getKey(), entry.getValue());
         }
     }
 
     private void devolverEstoque(List<ItemPedido> itens) {
-        // Agrupar por produto para somar quantidades em caso de produtos duplicados no pedido
         Map<Long, Integer> quantidadePorProduto = itens.stream()
                 .collect(Collectors.groupingBy(
                     item -> item.getProduto().getId(),
                     Collectors.summingInt(ItemPedido::getQuantidade)
                 ));
 
-        // Devolver estoque diretamente no banco usando batch update
         for (Map.Entry<Long, Integer> entry : quantidadePorProduto.entrySet()) {
             produtoRepository.devolverEstoque(entry.getKey(), entry.getValue());
         }

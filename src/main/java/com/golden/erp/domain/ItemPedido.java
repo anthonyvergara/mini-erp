@@ -44,7 +44,6 @@ public class ItemPedido {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
-    // Construtores
     public ItemPedido() {}
 
     public ItemPedido(Pedido pedido, Produto produto, Integer quantidade, BigDecimal desconto) {
@@ -56,7 +55,6 @@ public class ItemPedido {
         calcularSubtotal();
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -116,7 +114,6 @@ public class ItemPedido {
         this.subtotal = subtotal;
     }
 
-    // Métodos de negócio
     private void calcularSubtotal() {
         if (quantidade != null && precoUnitario != null) {
             BigDecimal valorBruto = precoUnitario.multiply(BigDecimal.valueOf(quantidade));

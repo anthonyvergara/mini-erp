@@ -68,7 +68,6 @@ public class AuthenticationResponse {
         }
     }
 
-    // Getters and Setters
     public String getAccessToken() {
         return accessToken;
     }

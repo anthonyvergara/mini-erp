@@ -18,7 +18,6 @@ public class ItemPedidoRequestDTO {
     @DecimalMin(value = "0.0", inclusive = true, message = "Desconto deve ser maior ou igual a zero")
     private BigDecimal desconto;
 
-    // Construtores
     public ItemPedidoRequestDTO() {}
 
     public ItemPedidoRequestDTO(Long produtoId, Integer quantidade, BigDecimal desconto) {
@@ -27,7 +26,6 @@ public class ItemPedidoRequestDTO {
         this.desconto = desconto;
     }
 
-    // Getters e Setters
     public Long getProdutoId() {
         return produtoId;
     }

@@ -25,7 +25,6 @@ public class ProdutoResponseDTO {
         this.ativo = ativo;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

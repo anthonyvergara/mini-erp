@@ -47,15 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
         String message = ex.getMessage();
 
-        // Determina o status code baseado na mensagem
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (message.contains("não encontrado")) {
             status = HttpStatus.NOT_FOUND;
-        } else if (message.contains("já está em uso") || message.contains("já existe")) {
+        } else if (message.contains("já está em uso") || message.contains("já existe") || message.contains("Pedido já pago")) {
             status = HttpStatus.CONFLICT;
         } else if (message.contains("CEP inválido") || message.contains("inválido")) {
             status = HttpStatus.BAD_REQUEST;
-        } else if (message.contains("Estoque insuficiente") || message.contains("regra")) {
+        } else if (message.contains("Estoque insuficiente") || message.contains("regra") || message.contains("Produtos inativos")) {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
         }
 

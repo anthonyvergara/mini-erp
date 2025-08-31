@@ -15,7 +15,6 @@ public class PedidoRequestDTO {
     @Valid
     private List<ItemPedidoRequestDTO> itens;
 
-    // Construtores
     public PedidoRequestDTO() {}
 
     public PedidoRequestDTO(Long clienteId, List<ItemPedidoRequestDTO> itens) {
@@ -23,7 +22,6 @@ public class PedidoRequestDTO {
         this.itens = itens;
     }
 
-    // Getters e Setters
     public Long getClienteId() {
         return clienteId;
     }

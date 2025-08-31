@@ -48,7 +48,6 @@ public class Cliente extends BaseEntity {
         this.endereco = endereco;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

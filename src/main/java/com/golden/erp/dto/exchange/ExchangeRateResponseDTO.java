@@ -19,7 +19,6 @@ public class ExchangeRateResponseDTO {
     public ExchangeRateResponseDTO() {}
 
     public boolean isSuccess() {
-        // A nova API não retorna campo success, então verificamos se temos dados válidos
         return rates != null && !rates.isEmpty();
     }
 

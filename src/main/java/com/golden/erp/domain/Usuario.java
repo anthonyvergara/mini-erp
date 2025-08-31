@@ -83,7 +83,6 @@ public class Usuario extends BaseEntity implements UserDetails {
         return ativo;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

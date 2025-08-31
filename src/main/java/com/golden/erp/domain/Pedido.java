@@ -48,14 +48,12 @@ public class Pedido extends BaseEntity {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();
 
-    // Construtores
     public Pedido() {}
 
     public Pedido(Cliente cliente) {
         this.cliente = cliente;
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -112,7 +110,6 @@ public class Pedido extends BaseEntity {
         this.itens = itens;
     }
 
-    // Métodos de negócio
     public void pagar() {
         if (this.status != StatusPedido.CREATED) {
             throw new IllegalStateException("Pedido só pode ser pago se estiver no status CREATED");

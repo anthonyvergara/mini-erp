@@ -35,7 +35,6 @@ public class ClienteRequestDTO {
         this.endereco = endereco;
     }
 
-    // Getters and Setters
     public String getNome() {
         return nome;
     }

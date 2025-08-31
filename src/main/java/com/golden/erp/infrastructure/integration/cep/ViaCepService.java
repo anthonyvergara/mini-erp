@@ -24,33 +24,21 @@ public class ViaCepService {
         this.context = context;
     }
 
-    /**
-     * Preenche os campos vazios do endereço consultando a API ViaCEP
-     */
     public EnderecoRequestDTO preencherEnderecoComViaCep(EnderecoRequestDTO enderecoRequest) {
         if (enderecoRequest.getCep() == null || enderecoRequest.getCep().trim().isEmpty()) {
             logger.debug("CEP não informado, retornando endereço sem alterações");
             return enderecoRequest;
         }
 
-        // Se todos os campos obrigatórios já estão preenchidos, não consulta o ViaCEP
         if (camposEnderecoCompletos(enderecoRequest)) {
             logger.debug("Endereço já completo, não será consultado o ViaCEP");
             return enderecoRequest;
         }
 
-        // Chamada através do proxy do Spring para habilitar retry
         ViaCepService selfProxy = context.getBean(ViaCepService.class);
         return selfProxy.consultarViaCep(enderecoRequest);
     }
 
-    /**
-     * Consulta ViaCEP com retry automático para erros de servidor (5xx)
-     * Usa backoff exponencial: 1s, 2s, 4s
-     *
-     * Método público para permitir que o proxy do Spring intercepte corretamente
-     * as chamadas e aplique o retry conforme configurado.
-     */
     @Retryable(
             retryFor = {FeignException.class},
             noRetryFor = {FeignException.BadRequest.class, FeignException.NotFound.class},
@@ -81,19 +69,13 @@ public class ViaCepService {
                     enderecoRequest.getCep(), e.getMessage(), e.status());
 
             if (e.status() >= 500) {
-                // Para erros 5xx, o retry será automático via @Retryable
                 throw e;
             } else {
-                // Para outros erros 4xx não tratados especificamente, não faz retry
                 throw new RuntimeException("Erro ao consultar CEP: " + enderecoRequest.getCep());
             }
         }
     }
 
-    /**
-     * Método de recuperação chamado quando todas as tentativas de retry falharem
-     * Este método é chamado automaticamente pelo Spring Retry
-     */
     @Recover
     public EnderecoRequestDTO recover(FeignException ex, EnderecoRequestDTO enderecoRequest) {
         logger.error("Todas as tentativas de consulta ao ViaCEP falharam para CEP: {}. " +
@@ -127,7 +109,6 @@ public class ViaCepService {
             enderecoRequest.setUf(viaCepResponse.getUf());
         }
 
-        // Se o complemento veio vazio mas o ViaCEP tem informação, preenche
         if ((enderecoRequest.getComplemento() == null || enderecoRequest.getComplemento().trim().isEmpty())
                 && viaCepResponse.getComplemento() != null && !viaCepResponse.getComplemento().trim().isEmpty()) {
             enderecoRequest.setComplemento(viaCepResponse.getComplemento());

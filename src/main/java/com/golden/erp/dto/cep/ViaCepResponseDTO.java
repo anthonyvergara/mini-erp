@@ -26,7 +26,6 @@ public class ViaCepResponseDTO {
 
     public ViaCepResponseDTO() {}
 
-    // Getters and Setters
     public String getCep() {
         return cep;
     }

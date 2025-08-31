@@ -23,10 +23,6 @@ public class PedidoSchedulerService {
         this.pedidoRepository = pedidoRepository;
     }
 
-    /**
-     * Tarefa A: Marcar pedidos atrasados
-     * Executa a cada hora e marca como LATE os pedidos CREATED com mais de 48 horas
-     */
     @Scheduled(fixedRate = 3600000) // 1 hora em milissegundos
     @Transactional
     public void marcarPedidosAtrasados() {

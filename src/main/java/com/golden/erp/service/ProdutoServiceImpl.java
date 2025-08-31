@@ -88,7 +88,6 @@ public class ProdutoServiceImpl implements ProdutoService {
         boolean skuJaExiste = produtoRepository.existsBySku(sku);
 
         if (skuJaExiste) {
-            // Se é atualização, verifica se o SKU pertence ao próprio produto
             if (idExcluir != null) {
                 Produto produtoComSku = produtoRepository.findBySku(sku).orElse(null);
                 if (produtoComSku != null && !produtoComSku.getId().equals(idExcluir)) {
@@ -101,20 +100,17 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     private void validarRegrasNegocio(ProdutoRequestDTO request) {
-        // Validar se estoque mínimo não é maior que estoque atual
         if (request.getEstoqueMinimo() > request.getEstoque()) {
             logger.warn("Tentativa de criar/atualizar produto com estoque mínimo ({}) maior que estoque atual ({})",
                        request.getEstoqueMinimo(), request.getEstoque());
             throw new RuntimeException("Estoque mínimo não pode ser maior que o estoque atual");
         }
 
-        // Log de aviso se estoque está abaixo do mínimo
         if (request.getEstoque() <= request.getEstoqueMinimo() && request.getEstoque() > 0) {
             logger.warn("Produto {} será criado/atualizado com estoque ({}) abaixo ou igual ao mínimo ({})",
                        request.getNome(), request.getEstoque(), request.getEstoqueMinimo());
         }
 
-        // Log de aviso se produto está sendo criado inativo
         if (!request.getAtivo()) {
             logger.warn("Produto {} será criado/atualizado como inativo", request.getNome());
         }

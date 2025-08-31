@@ -54,7 +54,6 @@ public class Produto extends BaseEntity {
         this.ativo = ativo;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

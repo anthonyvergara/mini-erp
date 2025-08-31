@@ -95,7 +95,6 @@ public class ClienteServiceImpl implements ClienteService {
         boolean emailJaExiste = clienteRepository.existsByEmail(email);
 
         if (emailJaExiste) {
-            // Se é atualização, verifica se o email pertence ao próprio cliente
             if (idExcluir != null) {
                 Cliente clienteComEmail = clienteRepository.findByEmail(email).orElse(null);
                 if (clienteComEmail != null && !clienteComEmail.getId().equals(idExcluir)) {
@@ -111,7 +110,6 @@ public class ClienteServiceImpl implements ClienteService {
         boolean cpfJaExiste = clienteRepository.existsByCpf(cpf);
 
         if (cpfJaExiste) {
-            // Se é atualização, verifica se o CPF pertence ao próprio cliente
             if (idExcluir != null) {
                 Cliente clienteComCpf = clienteRepository.findByCpf(cpf).orElse(null);
                 if (clienteComCpf != null && !clienteComCpf.getId().equals(idExcluir)) {

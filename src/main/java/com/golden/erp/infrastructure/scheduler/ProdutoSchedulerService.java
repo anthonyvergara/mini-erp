@@ -20,10 +20,6 @@ public class ProdutoSchedulerService {
         this.produtoRepository = produtoRepository;
     }
 
-    /**
-     * Tarefa B: Reabastecimento
-     * Executa diariamente às 03:00 e registra em log os produtos com estoque abaixo do mínimo
-     */
     @Scheduled(cron = "0 0 3 * * *") // Diariamente às 03:00
     public void verificarReabastecimento() {
         logger.info("Iniciando verificação de reabastecimento de produtos");
