@@ -2,8 +2,10 @@ package com.golden.erp.controller;
 
 import com.golden.erp.dto.pedido.PedidoRequestDTO;
 import com.golden.erp.dto.pedido.PedidoResponseDTO;
+import com.golden.erp.dto.pedido.PedidoUsdTotalResponseDTO;
 import com.golden.erp.entity.StatusPedido;
 import com.golden.erp.interfaces.PedidoService;
+import com.golden.erp.integration.exchange.ExchangeRateService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +19,11 @@ import org.springframework.web.bind.annotation.*;
 public class PedidoController {
 
     private final PedidoService pedidoService;
+    private final ExchangeRateService exchangeRateService;
 
-    public PedidoController(PedidoService pedidoService) {
+    public PedidoController(PedidoService pedidoService, ExchangeRateService exchangeRateService) {
         this.pedidoService = pedidoService;
+        this.exchangeRateService = exchangeRateService;
     }
 
     @PostMapping
@@ -59,5 +63,22 @@ public class PedidoController {
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         pedidoService.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/orders/{id}/usd-total")
+    public ResponseEntity<PedidoUsdTotalResponseDTO> obterTotalEmUsd(@PathVariable Long id) {
+        PedidoResponseDTO pedido = pedidoService.buscarPorId(id);
+
+        java.math.BigDecimal exchangeRate = exchangeRateService.getBrlToUsdRate();
+        java.math.BigDecimal totalUsd = exchangeRateService.convertBrlToUsd(pedido.getTotal());
+
+        PedidoUsdTotalResponseDTO response = new PedidoUsdTotalResponseDTO(
+                pedido.getId(),
+                pedido.getTotal(),
+                totalUsd,
+                exchangeRate
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
