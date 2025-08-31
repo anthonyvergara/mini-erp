@@ -1,14 +1,14 @@
 package com.golden.erp.service;
 
-import com.golden.erp.entity.Cliente;
-import com.golden.erp.entity.Endereco;
+import com.golden.erp.domain.Cliente;
+import com.golden.erp.domain.Endereco;
 import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
 import com.golden.erp.dto.cliente.EnderecoRequestDTO;
 import com.golden.erp.dto.cliente.EnderecoResponseDTO;
-import com.golden.erp.integration.cep.ViaCepService;
+import com.golden.erp.infrastructure.integration.cep.ViaCepService;
 import com.golden.erp.interfaces.ClienteService;
-import com.golden.erp.repository.ClienteRepository;
+import com.golden.erp.infrastructure.repository.ClienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

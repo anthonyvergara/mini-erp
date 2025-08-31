@@ -1,9 +1,11 @@
 package com.golden.erp.service;
 
 import com.golden.erp.dto.pedido.*;
-import com.golden.erp.entity.*;
+import com.golden.erp.domain.*;
+import com.golden.erp.infrastructure.repository.ClienteRepository;
+import com.golden.erp.infrastructure.repository.PedidoRepository;
+import com.golden.erp.infrastructure.repository.ProdutoRepository;
 import com.golden.erp.interfaces.PedidoService;
-import com.golden.erp.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;

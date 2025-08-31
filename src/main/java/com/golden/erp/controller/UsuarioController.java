@@ -1,7 +1,7 @@
 package com.golden.erp.controller;
 
-import com.golden.erp.entity.Usuario;
-import com.golden.erp.repository.UsuarioRepository;
+import com.golden.erp.domain.Usuario;
+import com.golden.erp.infrastructure.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

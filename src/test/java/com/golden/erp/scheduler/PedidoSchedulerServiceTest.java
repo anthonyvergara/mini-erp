@@ -1,9 +1,10 @@
 package com.golden.erp.scheduler;
 
-import com.golden.erp.entity.Cliente;
-import com.golden.erp.entity.Pedido;
-import com.golden.erp.entity.StatusPedido;
-import com.golden.erp.repository.PedidoRepository;
+import com.golden.erp.domain.Cliente;
+import com.golden.erp.domain.Pedido;
+import com.golden.erp.domain.StatusPedido;
+import com.golden.erp.infrastructure.repository.PedidoRepository;
+import com.golden.erp.infrastructure.scheduler.PedidoSchedulerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

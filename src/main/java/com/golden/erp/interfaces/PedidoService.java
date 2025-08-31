@@ -2,7 +2,7 @@ package com.golden.erp.interfaces;
 
 import com.golden.erp.dto.pedido.PedidoRequestDTO;
 import com.golden.erp.dto.pedido.PedidoResponseDTO;
-import com.golden.erp.entity.StatusPedido;
+import com.golden.erp.domain.StatusPedido;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

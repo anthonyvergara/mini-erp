@@ -1,7 +1,8 @@
 package com.golden.erp.scheduler;
 
-import com.golden.erp.entity.Produto;
-import com.golden.erp.repository.ProdutoRepository;
+import com.golden.erp.domain.Produto;
+import com.golden.erp.infrastructure.repository.ProdutoRepository;
+import com.golden.erp.infrastructure.scheduler.ProdutoSchedulerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

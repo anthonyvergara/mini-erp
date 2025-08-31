@@ -3,10 +3,9 @@ package com.golden.erp.controller;
 import com.golden.erp.dto.pedido.PedidoRequestDTO;
 import com.golden.erp.dto.pedido.PedidoResponseDTO;
 import com.golden.erp.dto.pedido.PedidoUsdTotalResponseDTO;
-import com.golden.erp.entity.StatusPedido;
+import com.golden.erp.domain.StatusPedido;
 import com.golden.erp.interfaces.PedidoService;
-import com.golden.erp.integration.exchange.ExchangeRateService;
-import io.micrometer.core.instrument.MeterRegistry;
+import com.golden.erp.infrastructure.integration.exchange.ExchangeRateService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/pedidos")

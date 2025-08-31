@@ -1,6 +1,6 @@
 package com.golden.erp.dto.pedido;
 
-import com.golden.erp.entity.StatusPedido;
+import com.golden.erp.domain.StatusPedido;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
