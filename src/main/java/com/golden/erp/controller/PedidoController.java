@@ -7,15 +7,19 @@ import com.golden.erp.domain.StatusPedido;
 import com.golden.erp.interfaces.PedidoService;
 import com.golden.erp.infrastructure.integration.exchange.ExchangeRateService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/pedidos")
+@Validated
 public class PedidoController {
 
     private final PedidoService pedidoService;
@@ -33,7 +37,8 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<PedidoResponseDTO> buscarPorId(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         PedidoResponseDTO response = pedidoService.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
@@ -48,25 +53,29 @@ public class PedidoController {
     }
 
     @PatchMapping("/{id}/pagar")
-    public ResponseEntity<PedidoResponseDTO> pagar(@PathVariable Long id) {
+    public ResponseEntity<PedidoResponseDTO> pagar(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         PedidoResponseDTO response = pedidoService.pagar(id);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<PedidoResponseDTO> cancelar(@PathVariable Long id) {
+    public ResponseEntity<PedidoResponseDTO> cancelar(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         PedidoResponseDTO response = pedidoService.cancelar(id);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+    public ResponseEntity<Void> excluir(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         pedidoService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/usd-total")
-    public ResponseEntity<PedidoUsdTotalResponseDTO> obterTotalEmUsd(@PathVariable Long id) {
+    public ResponseEntity<PedidoUsdTotalResponseDTO> obterTotalEmUsd(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         PedidoResponseDTO pedido = pedidoService.buscarPorId(id);
 
         java.math.BigDecimal exchangeRate = exchangeRateService.getBrlToUsdRate();

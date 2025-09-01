@@ -13,6 +13,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -40,6 +42,41 @@ public class GlobalExceptionHandler {
         );
 
         logger.warn("Erro de validação: {}", errors);
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getConstraintViolations().forEach(violation -> {
+            String fieldName = violation.getPropertyPath().toString();
+            String errorMessage = violation.getMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                "Parâmetros inválidos",
+                errors,
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        logger.warn("Erro de validação de parâmetros: {}", errors);
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        String message = String.format("Parâmetro '%s' deve ser um número válido", ex.getName());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                message,
+                null,
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        logger.warn("Erro de tipo de parâmetro: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
     }
 

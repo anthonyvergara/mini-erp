@@ -4,15 +4,19 @@ import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
 import com.golden.erp.interfaces.ClienteService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/clientes")
+@Validated
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -28,14 +32,16 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> atualizar(@PathVariable Long id,
-                                                       @Valid @RequestBody ClienteRequestDTO request) {
+    public ResponseEntity<ClienteResponseDTO> atualizar(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id,
+            @Valid @RequestBody ClienteRequestDTO request) {
         ClienteResponseDTO response = clienteService.atualizar(id, request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ClienteResponseDTO> buscarPorId(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         ClienteResponseDTO response = clienteService.buscarPorId(id);
         return ResponseEntity.ok(response);
     }
@@ -49,7 +55,8 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+    public ResponseEntity<Void> excluir(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         clienteService.excluir(id);
         return ResponseEntity.noContent().build();
     }

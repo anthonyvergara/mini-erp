@@ -2,17 +2,21 @@ package com.golden.erp.controller;
 
 import com.golden.erp.domain.Usuario;
 import com.golden.erp.infrastructure.repository.UsuarioRepository;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*")
+@Validated
 public class UsuarioController {
 
     @Autowired
@@ -33,7 +37,8 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
+    public ResponseEntity<Usuario> getUsuarioById(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         return usuarioRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -41,7 +46,8 @@ public class UsuarioController {
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Usuario> toggleUsuarioStatus(@PathVariable Long id) {
+    public ResponseEntity<Usuario> toggleUsuarioStatus(
+            @PathVariable @NotNull(message = "ID é obrigatório") @Positive(message = "ID deve ser um número positivo") Long id) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setAtivo(!usuario.getAtivo());

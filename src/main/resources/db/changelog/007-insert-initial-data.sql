@@ -16,7 +16,7 @@ VALUES
 
 -- Inserir cliente de exemplo
 INSERT INTO clientes (nome, email, cpf, logradouro, numero, complemento, bairro, cidade, uf, cep)
-VALUES ('João Silva Santos', 'joao.silva@email.com', '12345678901', 'Rua das Flores', '123', 'Apto 45', 'Centro', 'São Paulo', 'SP', '01234567');
+VALUES ('Anthony Vergara', 'anthony.vergara@golden.com', '12345678901', 'Rua das Flores', '123', 'Apto 45', 'Centro', 'São Paulo', 'SP', '01234567');
 
 --rollback DELETE FROM usuarios WHERE username = 'admin';
 --rollback DELETE FROM produto WHERE sku IN ('PROD001', 'PROD002', 'PROD003', 'PROD004', 'PROD005');
