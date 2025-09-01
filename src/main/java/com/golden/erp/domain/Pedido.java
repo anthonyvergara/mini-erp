@@ -1,5 +1,6 @@
 package com.golden.erp.domain;
 
+import com.golden.erp.exception.ConflictException;
 import com.golden.erp.infrastructure.metrics.PedidoMetricsListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -119,7 +120,7 @@ public class Pedido extends BaseEntity {
 
     public void cancelar() {
         if (this.status == StatusPedido.PAID) {
-            throw new IllegalStateException("Pedido já pago não pode ser cancelado");
+            throw new ConflictException("Pedido já pago não pode ser cancelado");
         }
         this.status = StatusPedido.CANCELLED;
     }

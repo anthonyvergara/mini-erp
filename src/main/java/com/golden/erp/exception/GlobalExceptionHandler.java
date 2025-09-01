@@ -93,30 +93,69 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
-        String message = ex.getMessage();
-
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        if (message.contains("não encontrado")) {
-            status = HttpStatus.NOT_FOUND;
-        } else if (message.contains("já está em uso") || message.contains("já existe") || message.contains("Pedido já pago")) {
-            status = HttpStatus.CONFLICT;
-        } else if (message.contains("CEP inválido") || message.contains("inválido")) {
-            status = HttpStatus.BAD_REQUEST;
-        } else if (message.contains("Estoque insuficiente") || message.contains("regra") || message.contains("Produtos inativos")) {
-            status = HttpStatus.UNPROCESSABLE_ENTITY;
-        }
-
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-                message,
+                ex.getMessage(),
                 null,
                 LocalDateTime.now(),
-                status.value()
+                HttpStatus.NOT_FOUND.value()
         );
 
-        logger.error("Erro de negócio: {}", message, ex);
-        return ResponseEntity.status(status).body(errorResponse);
+        logger.warn("Entidade não encontrada: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                null,
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value()
+        );
+
+        logger.warn("Conflito de dados: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataException(InvalidDataException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                null,
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        logger.warn("Dados inválidos: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessRuleException(BusinessRuleException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                null,
+                LocalDateTime.now(),
+                HttpStatus.UNPROCESSABLE_ENTITY.value()
+        );
+
+        logger.warn("Regra de negócio violada: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorResponse);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                "Erro interno do servidor",
+                null,
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value()
+        );
+
+        logger.error("Erro de runtime não tratado: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     @ExceptionHandler(FeignException.class)

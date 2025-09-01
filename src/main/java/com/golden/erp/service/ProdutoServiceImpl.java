@@ -3,6 +3,8 @@ package com.golden.erp.service;
 import com.golden.erp.domain.Produto;
 import com.golden.erp.dto.produto.ProdutoRequestDTO;
 import com.golden.erp.dto.produto.ProdutoResponseDTO;
+import com.golden.erp.exception.ConflictException;
+import com.golden.erp.exception.EntityNotFoundException;
 import com.golden.erp.interfaces.ProdutoService;
 import com.golden.erp.infrastructure.repository.ProdutoRepository;
 import com.golden.erp.mapper.ProdutoMapper;
@@ -81,7 +83,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     private Produto buscarProdutoPorId(Long id) {
         return produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + id));
     }
 
     private void validarUnicidadeSku(String sku, Long idExcluir) {
@@ -91,10 +93,10 @@ public class ProdutoServiceImpl implements ProdutoService {
             if (idExcluir != null) {
                 Produto produtoComSku = produtoRepository.findBySku(sku).orElse(null);
                 if (produtoComSku != null && !produtoComSku.getId().equals(idExcluir)) {
-                    throw new RuntimeException("SKU já está em uso por outro produto");
+                    throw new ConflictException("SKU já está em uso por outro produto");
                 }
             } else {
-                throw new RuntimeException("SKU já está em uso");
+                throw new ConflictException("SKU já está em uso");
             }
         }
     }

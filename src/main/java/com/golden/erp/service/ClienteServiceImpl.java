@@ -3,6 +3,8 @@ package com.golden.erp.service;
 import com.golden.erp.domain.Cliente;
 import com.golden.erp.dto.cliente.ClienteRequestDTO;
 import com.golden.erp.dto.cliente.ClienteResponseDTO;
+import com.golden.erp.exception.ConflictException;
+import com.golden.erp.exception.EntityNotFoundException;
 import com.golden.erp.infrastructure.integration.cep.ViaCepService;
 import com.golden.erp.interfaces.ClienteService;
 import com.golden.erp.infrastructure.repository.ClienteRepository;
@@ -88,7 +90,7 @@ public class ClienteServiceImpl implements ClienteService {
 
     private Cliente buscarClientePorId(Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com ID: " + id));
     }
 
     private void validarUnicidadeEmail(String email, Long idExcluir) {
@@ -98,10 +100,10 @@ public class ClienteServiceImpl implements ClienteService {
             if (idExcluir != null) {
                 Cliente clienteComEmail = clienteRepository.findByEmail(email).orElse(null);
                 if (clienteComEmail != null && !clienteComEmail.getId().equals(idExcluir)) {
-                    throw new RuntimeException("Email já está em uso por outro cliente");
+                    throw new ConflictException("Email já está em uso por outro cliente");
                 }
             } else {
-                throw new RuntimeException("Email já está em uso");
+                throw new ConflictException("Email já está em uso");
             }
         }
     }
@@ -113,10 +115,10 @@ public class ClienteServiceImpl implements ClienteService {
             if (idExcluir != null) {
                 Cliente clienteComCpf = clienteRepository.findByCpf(cpf).orElse(null);
                 if (clienteComCpf != null && !clienteComCpf.getId().equals(idExcluir)) {
-                    throw new RuntimeException("CPF já está em uso por outro cliente");
+                    throw new ConflictException("CPF já está em uso por outro cliente");
                 }
             } else {
-                throw new RuntimeException("CPF já está em uso");
+                throw new ConflictException("CPF já está em uso");
             }
         }
     }

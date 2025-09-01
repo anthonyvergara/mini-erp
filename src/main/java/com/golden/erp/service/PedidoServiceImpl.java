@@ -2,6 +2,9 @@ package com.golden.erp.service;
 
 import com.golden.erp.dto.pedido.*;
 import com.golden.erp.domain.*;
+import com.golden.erp.exception.BusinessRuleException;
+import com.golden.erp.exception.ConflictException;
+import com.golden.erp.exception.EntityNotFoundException;
 import com.golden.erp.infrastructure.repository.ClienteRepository;
 import com.golden.erp.infrastructure.repository.PedidoRepository;
 import com.golden.erp.infrastructure.repository.ProdutoRepository;
@@ -47,7 +50,7 @@ public class PedidoServiceImpl implements PedidoService {
         logger.info("Criando pedido para cliente ID: {}", request.getClienteId());
 
         Cliente cliente = clienteRepository.findById(request.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
         Map<Long, Produto> produtos = validarProdutosEEstoque(request.getItens());
 
@@ -72,7 +75,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         Pedido pedido = pedidoRepository.findByIdWithFullDetails(id);
         if (pedido == null) {
-            throw new RuntimeException("Pedido não encontrado");
+            throw new EntityNotFoundException("Pedido não encontrado");
         }
 
         return pedidoMapper.toResponseDTO(pedido);
@@ -91,7 +94,7 @@ public class PedidoServiceImpl implements PedidoService {
         logger.info("Processando pagamento do pedido ID: {}", id);
 
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
 
         try {
             pedido.pagar();
@@ -110,11 +113,11 @@ public class PedidoServiceImpl implements PedidoService {
 
         Pedido pedido = pedidoRepository.findByIdWithFullDetails(id);
         if (pedido == null) {
-            throw new RuntimeException("Pedido não encontrado");
+            throw new jakarta.persistence.EntityNotFoundException("Pedido não encontrado");
         }
 
         if (!pedido.podeSerCancelado()) {
-            throw new RuntimeException("Pedido já pago não pode ser cancelado");
+            throw new ConflictException("Pedido já pago não pode ser cancelado");
         }
 
         if (!pedido.estaPago()) {
@@ -134,7 +137,7 @@ public class PedidoServiceImpl implements PedidoService {
 
         Pedido pedido = pedidoRepository.findByIdWithFullDetails(id);
         if (pedido == null) {
-            throw new RuntimeException("Pedido não encontrado");
+            throw new jakarta.persistence.EntityNotFoundException("Pedido não encontrado");
         }
 
         if (!pedido.estaPago()) {
@@ -165,7 +168,7 @@ public class PedidoServiceImpl implements PedidoService {
                 .toList();
 
         if (!produtosNaoEncontrados.isEmpty()) {
-            throw new RuntimeException("Produtos não encontrados: " + produtosNaoEncontrados);
+            throw new EntityNotFoundException("Produtos não encontrados: " + produtosNaoEncontrados);
         }
 
         List<String> produtosInativos = produtos.values().stream()
@@ -174,7 +177,7 @@ public class PedidoServiceImpl implements PedidoService {
                 .toList();
 
         if (!produtosInativos.isEmpty()) {
-            throw new RuntimeException("Produtos inativos: " + produtosInativos);
+            throw new BusinessRuleException("Produtos inativos: " + produtosInativos);
         }
 
         List<String> produtosSemEstoque = new ArrayList<>();
@@ -190,7 +193,7 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         if (!produtosSemEstoque.isEmpty()) {
-            throw new RuntimeException("Estoque insuficiente para: " + produtosSemEstoque);
+            throw new BusinessRuleException("Estoque insuficiente para: " + produtosSemEstoque);
         }
 
         return produtos;

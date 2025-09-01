@@ -4,6 +4,7 @@ import com.golden.erp.dto.auth.AuthenticationRequest;
 import com.golden.erp.dto.auth.AuthenticationResponse;
 import com.golden.erp.dto.auth.RegisterRequest;
 import com.golden.erp.domain.Usuario;
+import com.golden.erp.exception.ConflictException;
 import com.golden.erp.infrastructure.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,11 +30,11 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         // Verificar se usuário já existe
         if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Nome de usuário já existe");
+            throw new ConflictException("Nome de usuário já existe");
         }
 
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new ConflictException("Email já cadastrado");
         }
 
         var usuario = new Usuario(
