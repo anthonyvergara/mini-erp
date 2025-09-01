@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,7 @@ public class ViaCepService {
 
     @Retryable(
             retryFor = {FeignException.class},
-            noRetryFor = {FeignException.BadRequest.class, FeignException.NotFound.class},
+            noRetryFor = {FeignException.BadRequest.class, FeignException.NotFound.class, CepInvalidoException.class},
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
     public EnderecoRequestDTO consultarViaCep(EnderecoRequestDTO enderecoRequest) {
@@ -72,16 +71,6 @@ public class ViaCepService {
                 throw new RuntimeException("Erro ao consultar CEP: " + enderecoRequest.getCep());
             }
         }
-    }
-
-    @Recover
-    public EnderecoRequestDTO recover(FeignException ex, EnderecoRequestDTO enderecoRequest) {
-
-        logger.error("Todas as tentativas de consulta ao ViaCEP falharam para CEP: {}. " +
-                "Status: {}, Mensagem: {}",
-                enderecoRequest.getCep(), ex.status(), ex.getMessage());
-
-        throw new RuntimeException("Serviço de CEP temporariamente indisponível. Tente novamente mais tarde.");
     }
 
     private boolean camposEnderecoCompletos(EnderecoRequestDTO endereco) {

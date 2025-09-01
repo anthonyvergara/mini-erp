@@ -69,8 +69,6 @@ public class GlobalExceptionHandler {
             status = HttpStatus.BAD_REQUEST;
         } else if (message.contains("Estoque insuficiente") || message.contains("regra") || message.contains("Produtos inativos")) {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
-        } else if (message.contains("Serviço de CEP temporariamente indisponível")) {
-            status = HttpStatus.SERVICE_UNAVAILABLE;
         }
 
         ErrorResponse errorResponse = new ErrorResponse(
