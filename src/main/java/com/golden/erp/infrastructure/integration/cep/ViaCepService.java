@@ -2,6 +2,7 @@ package com.golden.erp.infrastructure.integration.cep;
 
 import com.golden.erp.dto.cep.ViaCepResponseDTO;
 import com.golden.erp.dto.cliente.EnderecoRequestDTO;
+import com.golden.erp.exception.CepInvalidoException;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class ViaCepService {
 
             if (viaCepResponse.getErro() != null && viaCepResponse.getErro()) {
                 logger.warn("ViaCEP retornou erro para CEP: {}", enderecoRequest.getCep());
-                throw new RuntimeException("CEP inválido: " + enderecoRequest.getCep());
+                throw new CepInvalidoException("CEP inválido: " + enderecoRequest.getCep());
             }
 
             logger.info("Dados do ViaCEP obtidos com sucesso para CEP: {}", enderecoRequest.getCep());
@@ -60,10 +61,7 @@ public class ViaCepService {
 
         } catch (FeignException.BadRequest e) {
             logger.error("CEP inválido (400): {}", enderecoRequest.getCep());
-            throw new RuntimeException("CEP inválido: " + enderecoRequest.getCep());
-        } catch (FeignException.NotFound e) {
-            logger.error("CEP não encontrado (404): {}", enderecoRequest.getCep());
-            throw new RuntimeException("CEP não encontrado: " + enderecoRequest.getCep());
+            throw new CepInvalidoException("CEP inválido: " + enderecoRequest.getCep());
         } catch (FeignException e) {
             logger.error("Erro ao consultar ViaCEP para CEP {}: {} (Status: {})",
                     enderecoRequest.getCep(), e.getMessage(), e.status());
@@ -78,6 +76,7 @@ public class ViaCepService {
 
     @Recover
     public EnderecoRequestDTO recover(FeignException ex, EnderecoRequestDTO enderecoRequest) {
+
         logger.error("Todas as tentativas de consulta ao ViaCEP falharam para CEP: {}. " +
                 "Status: {}, Mensagem: {}",
                 enderecoRequest.getCep(), ex.status(), ex.getMessage());

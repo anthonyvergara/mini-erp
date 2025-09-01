@@ -43,6 +43,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    @ExceptionHandler(CepInvalidoException.class)
+    public ResponseEntity<ErrorResponse> handleCepInvalidoException(CepInvalidoException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                null,
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        logger.warn("Erro de CEP inválido: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
         String message = ex.getMessage();
@@ -56,6 +69,8 @@ public class GlobalExceptionHandler {
             status = HttpStatus.BAD_REQUEST;
         } else if (message.contains("Estoque insuficiente") || message.contains("regra") || message.contains("Produtos inativos")) {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
+        } else if (message.contains("Serviço de CEP temporariamente indisponível")) {
+            status = HttpStatus.SERVICE_UNAVAILABLE;
         }
 
         ErrorResponse errorResponse = new ErrorResponse(
