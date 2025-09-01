@@ -57,7 +57,6 @@ src/main/java/com/golden/erp/
     └── security/       # Configurações de segurança JWT
 
 src/main/resources/
-├── docs/               # Documentação técnica
 ├── db/changelog/       # Scripts Liquibase
 ├── application.properties
 └── logback-spring.xml  # Configuração de logs
@@ -127,7 +126,6 @@ Essa estrutura está separada em camadas lógicas, cada uma com sua responsabili
 ```
 POST   /api/auth/register     - Registrar novo usuário
 POST   /api/auth/login        - Login
-POST   /api/auth/authenticate - Autenticação
 ```
 
 ### 👥 Usuários (`/api/usuarios`) - Requer autenticação
@@ -140,9 +138,9 @@ PUT    /api/usuarios/{id}/status - Ativar/desativar usuário (ADMIN)
 
 ### ✅ Métricas (`/actuator/metrics`)
 ```
-GET     /actuator/metrics/pedidos.criados    - Quantidade total de pedidos criados
-GET     /actuator/metrics/pedidos.criados.por_hora?tag=hora:12    - Quantidade de pedidos criados por hora especifica
-GET     /actuator/metrics/pedidos.criados.por_hora - Quantidade de pedidos criados por hora
+GET     /actuator/metrics/pedidos.criados                           - Quantidade total de pedidos criados
+GET     /actuator/metrics/pedidos.criados.por_hora?tag=hora:12      - Quantidade de pedidos criados por hora especifica
+GET     /actuator/metrics/pedidos.criados.por_hora                  - Quantidade de pedidos criados por hora
 ```
 
 ### 👤 Clientes (`/clientes`) - Requer autenticação
@@ -165,13 +163,13 @@ DELETE /produtos/{id}         - Excluir produto
 
 ### 🛒 Pedidos (`/pedidos`) - Requer autenticação
 ```
-POST   /pedidos               - Criar pedido (baixa estoque automaticamente)
-GET    /pedidos/{id}          - Buscar pedido por ID
-GET    /pedidos               - Listar pedidos (filtros: clienteId, status, paginação)
-PATCH  /pedidos/{id}/pagar    - Marcar pedido como pago
-PATCH  /pedidos/{id}/cancelar - Cancelar pedido (devolve estoque)
-DELETE /pedidos/{id}          - Soft delete do pedido
-GET    /pedidos/{id}/usd-total - Obter total do pedido em USD
+POST   /pedidos                 - Criar pedido (baixa estoque automaticamente)
+GET    /pedidos/{id}            - Buscar pedido por ID
+GET    /pedidos                 - Listar pedidos (filtros: clienteId, status, paginação)
+PATCH  /pedidos/{id}/pagar      - Marcar pedido como pago
+PATCH  /pedidos/{id}/cancelar   - Cancelar pedido (devolve estoque)
+DELETE /pedidos/{id}            - Soft delete do pedido
+GET    /pedidos/{id}/usd-total  - Obter total do pedido em USD
 ```
 
 ### Exemplos de Uso com `curl`
@@ -189,8 +187,8 @@ curl -X POST http://localhost:8080/clientes \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {seu-jwt-token}" \
   -d '{
-    "nome": "João Silva",
-    "email": "joao@email.com",
+    "nome": "Anthony Vergara",
+    "email": "anthony.vergara@email.com",
     "cpf": "12345678901",
     "endereco": {
       "numero": "123",
