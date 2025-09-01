@@ -6,7 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Include SQL changelog files -->
-    <include file="db/changelog/000-drop-existing-tables.sql"/>
     <include file="db/changelog/001-create-usuarios-table.sql"/>
     <include file="db/changelog/002-create-clientes-table.sql"/>
     <include file="db/changelog/003-create-produto-table.sql"/>
