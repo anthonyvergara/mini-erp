@@ -31,7 +31,7 @@ A aplicação será executada automaticamente com:
 - ✅ Dados iniciais carregados
 - ✅ API REST disponível na porta 8080
 
-### Usuários Inicial
+### Usuário Inicial
 ```
 Admin: username=admin, password=admin123
 ```
